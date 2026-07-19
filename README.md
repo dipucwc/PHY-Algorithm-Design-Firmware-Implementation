@@ -82,7 +82,7 @@ The main objectives of this repository are to demonstrate the ability to:
 
 # Portfolio Projects
 
-## 01 — Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
+## 01- Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
 
 **Folder:**
 
@@ -259,7 +259,7 @@ It should not be described as a complete 5G NR PDSCH implementation because the 
 
 ---
 
-## 02 — RF Transceiver Algorithm-to-Firmware Implementation
+## 02-  RF Transceiver Algorithm-to-Firmware Implementation
 
 **Folder:**
 
@@ -430,7 +430,7 @@ The implementation will be checked using:
 
 ---
 
-## 03 — OFDM Synchronization Module
+## 03- OFDM Synchronization Module
 
 **Folder:**
 
@@ -524,9 +524,9 @@ The three projects are connected but do not have the same purpose.
 
 | Project | Main purpose | Main implementation level |
 |---|---|---|
-| 01 — MIMO-OFDM PHY Simulator | Complete modem and link-level processing | MATLAB/Python system simulation |
-| 02 — Algorithm-to-Firmware | Translation into implementation-oriented software | Embedded C and C++17 |
-| 03 — OFDM Synchronization | Detailed synchronization-algorithm analysis | MATLAB/Python algorithm study |
+| 01- MIMO-OFDM PHY Simulator | Complete modem and link-level processing | MATLAB/Python system simulation |
+| 02- Algorithm-to-Firmware | Translation into implementation-oriented software | Embedded C and C++17 |
+| 03- OFDM Synchronization | Detailed synchronization-algorithm analysis | MATLAB/Python algorithm study |
 
 The relationship can be represented as:
 
@@ -810,9 +810,9 @@ Each project folder will contain its own:
 
 | Project | Current status | Next major work |
 |---|---|---|
-| 01 — 8×8/16×16 MIMO-OFDM PHY Simulator | Ongoing | Modular simulator, hard/soft Viterbi comparison, AMC verification |
-| 02 — RF Transceiver Algorithm-to-Firmware | Ongoing | Fixed-point validation, C/C++ integration, extended unit tests |
-| 03 — OFDM Synchronization Module | Ongoing | Modular MATLAB implementation, RMSE analysis, verification gates |
+| 01-  8×8/16×16 MIMO-OFDM PHY Simulator | Completed| Modular simulator, hard/soft Viterbi comparison, AMC verification |
+| 02-  RF Transceiver Algorithm-to-Firmware | Ongoing | Fixed-point validation, C/C++ integration, extended unit tests |
+| 03-  OFDM Synchronization Module | Ongoing | Modular MATLAB implementation, RMSE analysis, verification gates |
 
 ## Repository-Level Development Status
 
@@ -838,7 +838,7 @@ No preliminary result will be presented as a final verified result until it is r
 
 # Development Roadmap
 
-## Phase 1 — Repository and Model Definition
+## Phase 1- Repository and Model Definition
 
 - [x] Define the three-project portfolio structure
 - [x] Separate system-level, focused-algorithm, and firmware projects
@@ -846,7 +846,7 @@ No preliminary result will be presented as a final verified result until it is r
 - [x] Add project-specific README files
 - [ ] Complete mathematical-model documentation
 
-## Phase 2 — MATLAB Reference Models
+## Phase 2- MATLAB Reference Models
 
 - [ ] Complete modular synchronization implementation
 - [ ] Complete configurable 8×8 and 16×16 MIMO simulation
@@ -856,7 +856,7 @@ No preliminary result will be presented as a final verified result until it is r
 - [ ] Complete soft-input Viterbi path
 - [ ] Add SINR-based link adaptation
 
-## Phase 3 — Verification
+## Phase 3- Verification
 
 - [ ] Add deterministic random-seed handling
 - [ ] Add algorithm unit tests
@@ -867,7 +867,7 @@ No preliminary result will be presented as a final verified result until it is r
 - [ ] Add result reproducibility tests
 - [ ] Add statistical confidence reporting
 
-## Phase 4 — Python Cross-Verification
+## Phase 4- Python Cross-Verification
 
 - [ ] Mirror the MATLAB signal chain
 - [ ] Share configuration files
@@ -876,7 +876,7 @@ No preliminary result will be presented as a final verified result until it is r
 - [ ] Record numerical tolerances
 - [ ] Publish cross-verification logs
 
-## Phase 5 — Fixed-Point and Firmware Implementation
+## Phase 5- Fixed-Point and Firmware Implementation
 
 - [ ] Define numerical ranges
 - [ ] Select Q formats
@@ -888,7 +888,7 @@ No preliminary result will be presented as a final verified result until it is r
 - [ ] Add CMake and CTest integration
 - [ ] Compare firmware and reference outputs
 
-## Phase 6 — Documentation and Release
+## Phase 6- Documentation and Release
 
 - [ ] Add final figures
 - [ ] Add raw CSV/MAT results
