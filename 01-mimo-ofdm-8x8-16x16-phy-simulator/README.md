@@ -1,4 +1,4 @@
-# Project 1 — Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
+# Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
 
 **Design, verification, and comparative performance evaluation of synchronization, channel estimation, MIMO detection, adaptive modulation, and hard/soft Viterbi decoding in MATLAB**
 
