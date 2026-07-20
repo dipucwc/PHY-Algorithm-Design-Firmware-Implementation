@@ -176,15 +176,15 @@ The synchronization experiment evaluates acquisition performance separately. Its
 ### Power-Normalized MIMO Signal Model
 
 For subcarrier $k$, the received frequency-domain signal is
+```
 
-$$
 \mathbf{y}[k]
 =
 \frac{1}{\sqrt{N_t}}
 \mathbf{H}[k]\mathbf{x}[k]
 +
 \mathbf{n}[k].
-$$
+```
 
 where:
 
@@ -199,11 +199,11 @@ The factor $1/\sqrt{N_t}$ keeps the total transmitted power constant when the nu
 
 For compact notation, define the power-normalized channel as
 
-$$
+```
 \mathbf{H}_s[k]
 =
 \frac{1}{\sqrt{N_t}}\mathbf{H}[k].
-$$
+```
 
 The received signal model can then be written as
 
@@ -213,31 +213,31 @@ $$
 \mathbf{H}_s[k]\mathbf{x}[k]
 +
 \mathbf{n}[k].
-$$
+```
 
 The corresponding estimated power-normalized channel is
 
-$$
+```
 \widehat{\mathbf{H}}_s[k]
 =
 \frac{1}{\sqrt{N_t}}
 \widehat{\mathbf{H}}[k].
-$$
+```
 
 ### Zero-Forcing Detection
 
 The zero-forcing detector estimates the transmitted symbol vector using the Moore-Penrose pseudo-inverse of the estimated channel:
 
-$$
+```
 \widehat{\mathbf{x}}_{\mathrm{ZF}}[k]
 =
 \widehat{\mathbf{H}}_s^{\dagger}[k]
 \mathbf{y}[k].
-$$
+```
 
 Equivalently, when the required matrix inverse exists,
 
-$$
+```
 \widehat{\mathbf{x}}_{\mathrm{ZF}}[k]
 =
 \left(
@@ -246,7 +246,7 @@ $$
 \right)^{-1}
 \widehat{\mathbf{H}}_s^{H}[k]
 \mathbf{y}[k].
-$$
+```
 
 where:
 
@@ -259,7 +259,7 @@ ZF suppresses inter-stream interference through channel inversion. However, it c
 
 The MMSE equalization matrix is
 
-$$
+```
 \mathbf{W}_{\mathrm{MMSE}}[k]
 =
 \left(
@@ -269,16 +269,16 @@ $$
 \sigma_n^2\mathbf{I}_{N_t}
 \right)^{-1}
 \widehat{\mathbf{H}}_s^{H}[k].
-$$
+```
 
 The raw MMSE symbol estimate is
 
-$$
+```
 \widetilde{\mathbf{x}}[k]
 =
 \mathbf{W}_{\mathrm{MMSE}}[k]
 \mathbf{y}[k].
-$$
+```
 
 The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement and makes MMSE detection more stable than direct channel inversion.
 
@@ -286,44 +286,44 @@ The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement an
 
 The raw MMSE output is generally amplitude-biased. Define the composite MMSE response as
 
-$$
+```
 \mathbf{G}[k]
 =
 \mathbf{W}_{\mathrm{MMSE}}[k]
 \widehat{\mathbf{H}}_s[k].
-$$
+```
 
 For spatial stream $i$, the effective MMSE gain is obtained from the corresponding diagonal element:
 
-$$
+```
 g_i[k]
 =
 \left[
 \mathbf{G}[k]
 \right]_{i,i}.
-$$
+```
 
 The gain-corrected unbiased MMSE output is
 
-$$
+```
 z_i[k]
 =
 \frac{\widetilde{x}_i[k]}
 {g_i[k]}.
-$$
+```
 
 The vector form is
 
-$$
+```
 \mathbf{z}[k]
 =
 \mathbf{D}_g^{-1}[k]
 \widetilde{\mathbf{x}}[k],
-$$
+```
 
 where
 
-$$
+```
 \mathbf{D}_g[k]
 =
 \operatorname{diag}
@@ -333,18 +333,18 @@ g_2[k],
 \ldots,
 g_{N_t}[k]
 \right).
-$$
+```
 
 ### Per-Stream Effective Noise Variance
 
 Under the assumed linear-MMSE model and unit symbol power, the reliability of stream $i$ is represented by the effective error variance
 
-$$
+```
 \sigma_{\mathrm{eff},i}^{2}[k]
 =
 \frac{1-g_i[k]}
 {g_i[k]}.
-$$
+```
 
 A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates greater residual interference and noise.
 
@@ -354,7 +354,7 @@ When estimated CSI is used, this quantity represents the receiver-side reliabili
 
 The hard-decision branch converts each unbiased MMSE symbol directly into binary decisions:
 
-$$
+```
 \widehat{b}_{i,q}^{\mathrm{hard}}[k]
 =
 \underset{b\in\{0,1\}}{\operatorname{arg\,min}}
@@ -363,8 +363,8 @@ $$
 \left|
 z_i[k]-a
 \right|^2.
-$$
-
+```
+```
 where:
 
 - $q$ identifies the bit position within the QAM symbol,
@@ -376,7 +376,7 @@ The hard-input Viterbi decoder receives only the resulting binary values.
 
 For coded bit $b_q$, the max-log LLR generated from stream $i$ is approximated as
 
-$$
+```
 L\left(
 b_q\mid z_i[k]
 \right)
@@ -394,11 +394,11 @@ z_i[k]-a
 z_i[k]-a
 \right|^2
 \right].
-$$
+```
 
 This definition uses the convention
 
-$$
+```
 L\left(b_q\mid z_i[k]\right)
 =
 \ln
@@ -407,7 +407,7 @@ P\left(b_q=0\mid z_i[k]\right)
 }{
 P\left(b_q=1\mid z_i[k]\right)
 }.
-$$
+```
 
 Therefore:
 
@@ -422,7 +422,7 @@ The hard- and soft-decision Viterbi branches use the same gain-corrected unbiase
 
 At a selected target coded BER, the soft-decision gain is defined as
 
-$$
+```
 \Delta\mathrm{SNR}
 \left(
 \mathrm{BER}_{\mathrm{target}}
@@ -437,7 +437,7 @@ $$
 \left(
 \mathrm{BER}_{\mathrm{target}}
 \right).
-$$
+```
 
 A positive value of $\Delta\mathrm{SNR}$ means that the soft-decision decoder reaches the selected BER target at a lower SNR than the hard-decision decoder.
 
