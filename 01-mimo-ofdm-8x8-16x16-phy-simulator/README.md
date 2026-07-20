@@ -276,41 +276,40 @@ The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement an
 
 The raw MMSE output is generally amplitude-biased. Define the composite response as
 
-$$
+```math
 \mathbf{G}[k]
 =
 \mathbf{W}_{\mathrm{MMSE}}[k]
 \widehat{\mathbf{H}}_s[k].
-$$
-
+```
 For spatial stream $i$, the effective MMSE gain is the corresponding diagonal element:
 
-$$
+```math
 g_i[k]
 =
 \left[\mathbf{G}[k]\right]_{i,i}.
-$$
+```
 
 The gain-corrected unbiased MMSE output is
 
-$$
+```math
 z_i[k]
 =
 \frac{\widetilde{x}_i[k]}{g_i[k]}.
-$$
+```
 
 In vector form,
 
-$$
+```math
 \mathbf{z}[k]
 =
 \mathbf{D}_g^{-1}[k]
 \widetilde{\mathbf{x}}[k],
-$$
+```
 
 where the diagonal gain matrix is written explicitly as
 
-$$
+```math
 \mathbf{D}_g[k]
 =
 \begin{bmatrix}
@@ -319,20 +318,20 @@ g_1[k] & 0 & \cdots & 0 \\
 \vdots & \vdots & \ddots & \vdots \\
 0 & 0 & \cdots & g_{N_t}[k]
 \end{bmatrix}.
-$$
+```
 
 ### Per-Stream Effective Noise Variance
 
 Under the assumed linear-MMSE model and unit symbol power, the receiver-side reliability estimate for stream $i$ is
 
-$$
+```math
 \sigma_{\mathrm{eff},i}^{2}[k]
 =
 \frac{1-g_i[k]}{g_i[k]}.
-$$
-
+```
+```math
 A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates stronger residual interference and noise.
-
+```
 With estimated CSI, this is a model-based reliability estimate rather than the exact realized error variance.
 
 ### Hard-Bit Generation
