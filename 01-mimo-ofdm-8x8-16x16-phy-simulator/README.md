@@ -911,7 +911,7 @@ GitHub: [dipucwc](https://github.com/dipucwc)
 @techreport{rahman2026mimoofdm,
   author      = {Md Moklesur Rahman},
   title       = {Design, Verification, and Comparative Performance Evaluation of a Scalable 8x8 and 16x16 MIMO-OFDM PHY Simulator with Threshold-Based Adaptive Modulation and Fixed-Rate Channel Coding},
-  institution = {Independent Research},
+  Researcher at Centre for Wireless Communications (CWC),Oulu University = {Independent Research},
   year        = {2026}
 }
 ```
