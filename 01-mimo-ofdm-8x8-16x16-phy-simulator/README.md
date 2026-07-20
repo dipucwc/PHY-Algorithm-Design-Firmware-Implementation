@@ -1,4 +1,4 @@
-# Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
+# Project 1 — Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator
 
 **Design, verification, and comparative performance evaluation of synchronization, channel estimation, MIMO detection, adaptive modulation, and hard/soft Viterbi decoding in MATLAB**
 
@@ -25,7 +25,7 @@ The project covers five important PHY/modem algorithm areas:
 
 A central part of the study is the controlled comparison between **hard-decision and soft-decision Viterbi decoding**. Both decoder branches are generated from the same gain-corrected, unbiased MMSE symbol stream. The hard branch discards reliability information and passes binary decisions to the decoder, while the soft branch uses per-stream effective-noise-variance-scaled log-likelihood ratios.
 
-> **Scope note:** This is a general MIMO-OFDM PHY/modem algorithm simulator. It is not presented as a standards-compliant 5G NR PDSCH implementation. Modulation is selected through configured SNR thresholds and the channel-code rate remains fixed at 1/2.
+> **Scope note:** This is a general MIMO-OFDM PHY/modem algorithm simulator. It is not presented as a standards-compliant 5G NR PDSCH implementation. This repository stage is **Project 1**, where modulation is selected through configured SNR thresholds and the channel-code rate remains fixed at 1/2. **Project 2**, maintained separately, extends the verified baseline to receiver-generated CQI, BLER-targeted MCS selection, and variable-rate adaptive modulation and coding.
 
 ---
 
@@ -38,6 +38,19 @@ The project was developed to answer the following technical questions:
 - How strongly does square-array scaling affect ZF and regularized MMSE detection?
 - What is gained by preserving reliability information for soft Viterbi decoding?
 - Does the benefit of statistical receiver processing increase as the MIMO array becomes larger?
+
+---
+
+## Relationship to Project 2
+
+The portfolio is intentionally divided into two technically distinct stages:
+
+| Stage | Adaptation input | Modulation | Coding rate | Main purpose |
+|---|---|---|---|---|
+| **Project 1 — this project** | Configured operating SNR and fixed thresholds | QPSK, 16-QAM, or 64-QAM | Fixed at 1/2 | Verify the complete synchronization, estimation, MIMO detection, equalization, and hard/soft decoding chain |
+| **Project 2 — advanced AMC extension** | Receiver-estimated effective SINR and generated CQI | Selected through an MCS table | Variable | Maintain a target BLER while maximizing achieved goodput |
+
+Project 2 reuses the verified PHY foundation but introduces a separate closed-loop link-adaptation contribution. Keeping the stages separate avoids presenting threshold-based modulation as full CQI/BLER-based AMC and prevents duplication of the baseline results.
 
 ---
 
@@ -67,7 +80,7 @@ The project was developed to answer the following technical questions:
 ### MIMO Processing and Equalization
 
 - Full spatial multiplexing over square MIMO channels
-- Equal total transmit-power normalization using \(1/\sqrt{N_t}\)
+- Equal total transmit-power normalization using $1/\sqrt{N_t}$
 - Per-subcarrier ZF detection
 - Regularized MMSE detection
 - MMSE gain correction to produce an unbiased symbol estimate
@@ -84,7 +97,7 @@ The project was developed to answer the following technical questions:
 - Unit-average-power QAM normalization
 - Rate-1/2 convolutional coding
 - Constraint length 7
-- Generator polynomials \([133\ 171]\) in octal form
+- Generator polynomials $[133\ 171]$ in octal form
 - Traceback depth 35
 - Hard-decision Viterbi decoding
 - Soft-decision unquantized Viterbi decoding
@@ -163,41 +176,41 @@ The synchronization experiment evaluates acquisition performance separately. Its
 
 ### Power-Normalized MIMO Signal Model
 
-For subcarrier \(k\),
+For subcarrier $k$,
 
-\[
+$$
 \mathbf{y}[k]
 =
 \frac{1}{\sqrt{N_t}}
 \mathbf{H}[k]\mathbf{x}[k]
 +
 \mathbf{n}[k],
-\]
+$$
 
 where:
 
-- \(N_t\) is the number of transmit antennas,
-- \(\mathbf{x}[k]\) contains unit-average-power spatial-layer symbols,
-- \(\mathbf{H}[k]\) is the \(N_r \times N_t\) frequency-domain MIMO channel,
-- \(\mathbf{n}[k]\sim\mathcal{CN}(\mathbf{0},\sigma_n^2\mathbf{I})\).
+- $N_t$ is the number of transmit antennas,
+- $\mathbf{x}[k]$ contains unit-average-power spatial-layer symbols,
+- $\mathbf{H}[k]$ is the $N_r \times N_t$ frequency-domain MIMO channel,
+- $\mathbf{n}[k]\sim\mathcal{CN}(\mathbf{0},\sigma_n^2\mathbf{I})$.
 
-The \(1/\sqrt{N_t}\) factor keeps the **total transmit power constant** when the array size changes.
+The $1/\sqrt{N_t}$ factor keeps the **total transmit power constant** when the array size changes.
 
 ### Zero-Forcing Detection
 
-With the scaled estimated channel \(\widehat{\mathbf{H}}_s=\widehat{\mathbf{H}}/\sqrt{N_t}\),
+With the scaled estimated channel $\widehat{\mathbf{H}}_s=\widehat{\mathbf{H}}/\sqrt{N_t}$,
 
-\[
+$$
 \widehat{\mathbf{x}}_{\mathrm{ZF}}
 =
 \widehat{\mathbf{H}}_s^{+}\mathbf{y}.
-\]
+$$
 
 ZF suppresses inter-stream interference by inversion, but it can strongly enhance noise when the estimated channel is poorly conditioned.
 
 ### MMSE Detection
 
-\[
+$$
 \mathbf{W}_{\mathrm{MMSE}}
 =
 \left(
@@ -206,42 +219,42 @@ ZF suppresses inter-stream interference by inversion, but it can strongly enhanc
 \sigma_n^2\mathbf{I}
 \right)^{-1}
 \widehat{\mathbf{H}}_s^{H},
-\]
+$$
 
-\[
+$$
 \widetilde{\mathbf{x}}
 =
 \mathbf{W}_{\mathrm{MMSE}}\mathbf{y}.
-\]
+$$
 
-The raw MMSE estimate is amplitude-biased. For stream \(i\), the effective gain is obtained from
+The raw MMSE estimate is amplitude-biased. For stream $i$, the effective gain is obtained from
 
-\[
+$$
 g_i=
 \left[
 \mathbf{W}_{\mathrm{MMSE}}\widehat{\mathbf{H}}_s
 \right]_{i,i},
-\]
+$$
 
 and the unbiased output is
 
-\[
+$$
 z_i=\frac{\widetilde{x}_i}{g_i}.
-\]
+$$
 
 Under the assumed linear-MMSE model and unit symbol power, the stream reliability is represented by
 
-\[
+$$
 \sigma_{\mathrm{eff},i}^{2}
 =
 \frac{1-g_i}{g_i}.
-\]
+$$
 
 ### Soft-Bit Generation
 
-The max-log LLR for coded bit \(b\) is approximated by
+The max-log LLR for coded bit $b$ is approximated by
 
-\[
+$$
 L(b\mid z_i)
 \approx
 \frac{1}{\sigma_{\mathrm{eff},i}^{2}}
@@ -250,21 +263,21 @@ L(b\mid z_i)
 -
 \min_{a\in\mathcal{S}_{b=0}}|z_i-a|^2
 \right].
-\]
+$$
 
-The hard and soft Viterbi branches use the same \(z_i\). The branches differ only in whether the decoder receives binary decisions or reliability-valued soft information.
+The hard and soft Viterbi branches use the same $z_i$. The branches differ only in whether the decoder receives binary decisions or reliability-valued soft information.
 
 ### Measured Soft-Decision Gain
 
 At a selected target BER,
 
-\[
+$$
 \Delta\mathrm{SNR}
 =
 \mathrm{SNR}_{\mathrm{hard}}
 -
 \mathrm{SNR}_{\mathrm{soft}}.
-\]
+$$
 
 Target crossings are interpolated on the logarithmic BER axis only when the measured curve crosses the requested target inside the simulated SNR range.
 
@@ -293,7 +306,7 @@ Target crossings are interpolated on the logarithmic BER axis only when the meas
 | Modulation thresholds | QPSK below 8 dB; 16-QAM from 8 to below 18 dB; 64-QAM from 18 dB |
 | Channel code | Rate-1/2 convolutional code |
 | Constraint length | 7 |
-| Generator polynomials | \([133\ 171]\), octal |
+| Generator polynomials | $[133\ 171]$, octal |
 | Viterbi traceback depth | 35 |
 | Synchronization trials | 400 trials per SNR point |
 | MIMO Monte Carlo depth | 100 slots per SNR point |
@@ -360,8 +373,8 @@ The reported capacity is an information-theoretic reference and is not interpret
 | Quantity | Measured result |
 |---|---:|
 | True normalized CFO | 0.25 subcarrier spacings |
-| Recovered versus genie BER at 30 dB | \(6.060\times10^{-3}\) versus \(6.059\times10^{-3}\) |
-| Total CFO RMSE at 30 dB | \(1.0\times10^{-3}\) subcarrier spacings |
+| Recovered versus genie BER at 30 dB | $6.060\times10^{-3}$ versus $6.059\times10^{-3}$ |
+| Total CFO RMSE at 30 dB | $1.0\times10^{-3}$ subcarrier spacings |
 | Timing RMSE floor | Approximately 11 samples |
 | Uncompensated-CFO behavior | BER floor near 0.2 |
 | Recovered-chain behavior | Overlaps the genie reference across the sweep |
@@ -372,39 +385,39 @@ The timing floor is caused by the known Schmidl-Cox metric plateau across the cy
 
 | Quantity | Measured result |
 |---|---:|
-| Wiener versus LS estimation MSE at 30 dB | \(1.5\times10^{-4}\) versus \(1.5\times10^{-3}\) |
+| Wiener versus LS estimation MSE at 30 dB | $1.5\times10^{-4}$ versus $1.5\times10^{-3}$ |
 | MMSE versus ZF output SINR at 30 dB | 15.5 dB versus 8.5 dB |
 | Ergodic capacity at 30 dB | 69.3 bit/s/Hz |
-| Soft gain at coded BER \(5\times10^{-2}\) | 4.30 dB |
-| Soft gain at coded BER \(10^{-1}\) | 4.07 dB |
+| Soft gain at coded BER $5\times10^{-2}$ | 4.30 dB |
+| Soft gain at coded BER $10^{-1}$ | 4.07 dB |
 
 Hard/soft crossings in the 64-QAM region:
 
 | Target coded BER | Hard crossing | Soft crossing | Soft gain |
 |---:|---:|---:|---:|
-| \(5\times10^{-2}\) | 28.06 dB | 23.76 dB | 4.30 dB |
-| \(10^{-1}\) | 25.10 dB | 21.03 dB | 4.07 dB |
+| $5\times10^{-2}$ | 28.06 dB | 23.76 dB | 4.30 dB |
+| $10^{-1}$ | 25.10 dB | 21.03 dB | 4.07 dB |
 
 ### 16×16 Results
 
 | Quantity | Measured result |
 |---|---:|
 | Ergodic capacity at 30 dB | 138.0 bit/s/Hz |
-| High-SNR LS estimation floor | Approximately \(7\times10^{-2}\) |
-| Wiener estimation MSE at 30 dB | \(3\times10^{-4}\) |
+| High-SNR LS estimation floor | Approximately $7\times10^{-2}$ |
+| Wiener estimation MSE at 30 dB | $3\times10^{-4}$ |
 | Wiener advantage over LS at 30 dB | Approximately 200× |
 | ZF output SINR at 30 dB | −2.2 dB |
 | MMSE output SINR at 30 dB | 14.4 dB |
-| Hard coded BER at 30 dB | \(5.2\times10^{-2}\) |
-| Soft coded BER at 30 dB | \(1.1\times10^{-2}\) |
-| Soft gain at coded BER \(10^{-1}\) | 5.05 dB |
+| Hard coded BER at 30 dB | $5.2\times10^{-2}$ |
+| Soft coded BER at 30 dB | $1.1\times10^{-2}$ |
+| Soft gain at coded BER $10^{-1}$ | 5.05 dB |
 
 Hard/soft crossings in the 64-QAM region:
 
 | Target coded BER | Hard crossing | Soft crossing | Soft gain |
 |---:|---:|---:|---:|
-| \(5\times10^{-2}\) | Not reached by 30 dB | 24.45 dB | Not extrapolated |
-| \(10^{-1}\) | 27.09 dB | 22.04 dB | 5.05 dB |
+| $5\times10^{-2}$ | Not reached by 30 dB | 24.45 dB | Not extrapolated |
+| $10^{-1}$ | 27.09 dB | 22.04 dB | 5.05 dB |
 
 ### Controlled 8×8-versus-16×16 Findings
 
@@ -423,7 +436,7 @@ The executed comparison supports the following conclusions:
    The MMSE output SINR changed from 15.5 dB at 8×8 to 14.4 dB at 16×16, a penalty of approximately 1.1 dB.
 
 5. **Soft information became more valuable at the larger array.**  
-   At coded BER \(10^{-1}\), the soft-over-hard separation increased from 4.07 dB at 8×8 to 5.05 dB at 16×16.
+   At coded BER $10^{-1}$, the soft-over-hard separation increased from 4.07 dB at 8×8 to 5.05 dB at 16×16.
 
 6. **The hard decoder absorbed most of the size penalty.**  
    In the 64-QAM region, the two soft-decoded curves remained close, while the 16×16 hard-decoded curve shifted approximately 2–3 dB to the right.
@@ -441,7 +454,7 @@ Four genuine defects were identified and corrected.
 | Defect | Observed symptom | Independent diagnosis | Correction |
 |---|---|---|---|
 | Genie synchronization reference compensated the wrong signal | Ideal-reference BER was implausibly high | Audited the definition of the genie case | Compensated the received signal with the true CFO |
-| Time-domain noise variance omitted the \(1/N\) OFDM scaling | BER near 0.5, very high EVM, and large timing error at nominally high SNR | Reproduced a 24 dB SNR discrepancy using two noise scalings | Divided the time-domain noise variance by the FFT length |
+| Time-domain noise variance omitted the $1/N$ OFDM scaling | BER near 0.5, very high EVM, and large timing error at nominally high SNR | Reproduced a 24 dB SNR discrepancy using two noise scalings | Divided the time-domain noise variance by the FFT length |
 | Preamble occupied the wrong zero-based subcarrier parity | CFO RMSE fixed at exactly 1.0 and recovered BER near 0.5, while the timing metric still appeared healthy | Reconstructed anti-identical time-domain halves and a −0.75 estimate for a true +0.25 CFO | Changed the MATLAB placement pattern to select zero-based even bins |
 | Hard and soft branches used different MMSE symbol streams | Decoder gap included both gain correction and soft-information effects | Compared the two branch inputs directly | Generated both hard bits and soft LLRs from the same unbiased MMSE output |
 
@@ -653,25 +666,6 @@ This sawtooth behavior is a direct consequence of threshold-based adaptive modul
 
 ---
 
-## Current Limitations
-
-The current implementation intentionally uses several controlled simplifications:
-
-- The Doppler model applies a common phase evolution rather than independent per-path Doppler spectra.
-- The timing estimate is evaluated statistically but does not move the MIMO demodulation FFT window.
-- The reported post-equalization SINR is reference-based rather than separated into desired, interference, and noise components.
-- Goodput and spectral efficiency are BER-based proxies, not measured CRC/BLER delivery rates.
-- Modulation selection is open-loop and uses the configured operating SNR.
-- The code rate remains fixed at 1/2.
-- Receiver CQI is not generated.
-- Modulation is not selected from receiver-estimated effective SINR or a BLER target.
-- Only linear ZF and MMSE detectors are evaluated.
-- The principal comparison uses square MIMO arrays, which can be poorly conditioned.
-
-These limitations bound the absolute interpretation of the results but do not invalidate the 8×8/16×16 controlled comparison because both configurations use the same assumptions.
-
----
-
 ## Planned Extensions
 
 Natural next steps are:
@@ -684,7 +678,7 @@ Natural next steps are:
 - Independent per-path Doppler using a sum-of-sinusoids model
 - Successive interference cancellation
 - Sphere detection
-- Asymmetric \(N_r>N_t\) many-antenna configurations
+- Asymmetric $N_r>N_t$ many-antenna configurations
 - Receiver-estimated effective-SINR mapping
 - Runtime, memory, and operation-count profiling
 - Embedded C/C++ or fixed-point implementation of selected receiver blocks
