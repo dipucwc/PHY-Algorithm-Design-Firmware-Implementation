@@ -128,7 +128,7 @@ The initial simulation configuration is shown below.
 | Fixed-point C/C++ study | Planned |
 
 The normalized CFO is defined relative to the OFDM subcarrier spacing:
-
+```math
 $$
 \epsilon = \frac{\Delta f_{\mathrm{CFO}}}{\Delta f_{\mathrm{SC}}}
 $$
@@ -166,7 +166,7 @@ $$
 ---
 
 ## Signal Model
-
+```math
 Let:
 
 - \(N\) be the FFT size
@@ -225,7 +225,7 @@ The repeated halves allow the receiver to estimate both:
 ### Half-Symbol Correlation
 
 For each candidate sample position \(d\), the receiver computes
-
+```math
 $$
 P(d)
 =
@@ -240,11 +240,11 @@ Here:
 - \(L=N/2\).
 
 When the observation window is aligned with the repeated preamble, the magnitude of \(P(d)\) becomes large.
-
+```
 ### Energy Normalization
 
 The energy of the second half is estimated as
-
+```math
 $$
 R(d)
 =
@@ -272,7 +272,7 @@ $$
 =
 \arg\max_d M(d).
 $$
-
+```
 The normalized metric reduces sensitivity to received-signal amplitude.
 
 ### Plateau Consideration
@@ -288,7 +288,7 @@ A repeated-half Schmidl–Cox preamble can produce a timing plateau rather than 
 ---
 
 ## Coarse CFO Estimation
-
+```math
 The phase of \(P(d)\) represents the phase difference accumulated between the repeated preamble halves.
 
 For a half-symbol separation \(L=N/2\),
@@ -345,7 +345,7 @@ After coarse CFO correction, a small residual CFO can remain because of:
 The residual CFO produces progressive phase rotation between OFDM symbols.
 
 Let the LS pilot-domain channel estimates from two consecutive OFDM symbols be
-
+```math
 $$
 \hat{H}_m[k]
 =
@@ -406,7 +406,7 @@ r[n]
 e^{-j2\pi
 \hat{\epsilon}_{\mathrm{total}}n/N}.
 $$
-
+```
 ---
 
 ## Receiver Processing Stages
