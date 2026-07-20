@@ -47,8 +47,8 @@ The portfolio is intentionally divided into two technically distinct stages:
 
 | Stage | Adaptation input | Modulation | Coding rate | Main purpose |
 |---|---|---|---|---|
-| **Project 1 — this project** | Configured operating SNR and fixed thresholds | QPSK, 16-QAM, or 64-QAM | Fixed at 1/2 | Verify the complete synchronization, estimation, MIMO detection, equalization, and hard/soft decoding chain |
-| **Project 2 — advanced AMC extension** | Receiver-estimated effective SINR and generated CQI | Selected through an MCS table | Variable | Maintain a target BLER while maximizing achieved goodput |
+| **Project 1- this project** | Configured operating SNR and fixed thresholds | QPSK, 16-QAM, or 64-QAM | Fixed at 1/2 | Verify the complete synchronization, estimation, MIMO detection, equalization, and hard/soft decoding chain |
+| **Project 2- advanced AMC extension** | Receiver-estimated effective SINR and generated CQI | Selected through an MCS table | Variable | Maintain a target BLER while maximizing achieved goodput |
 
 Project 2 reuses the verified PHY foundation but introduces a separate closed-loop link-adaptation contribution. Keeping the stages separate avoids presenting threshold-based modulation as full CQI/BLER-based AMC and prevents duplication of the baseline results.
 
