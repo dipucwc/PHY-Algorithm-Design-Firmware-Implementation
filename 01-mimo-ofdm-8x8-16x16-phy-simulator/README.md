@@ -339,39 +339,39 @@ With estimated CSI, this is a model-based reliability estimate rather than the e
 
 For bit position $q$ of the QAM symbol transmitted on stream $i$, define the minimum squared distance to the constellation subset associated with bit $0$ as
 
-$$
+```math
 d_{i,q}^{(0)}[k]
 =
 \min_{a\in\mathcal{S}_{q}^{(0)}}
 \left|z_i[k]-a\right|^2.
-$$
+```
 
 Similarly, define the minimum squared distance to the constellation subset associated with bit $1$ as
 
-$$
+```math
 d_{i,q}^{(1)}[k]
 =
 \min_{a\in\mathcal{S}_{q}^{(1)}}
 \left|z_i[k]-a\right|^2.
-$$
+```
 
 The hard bit decision is then
 
-$$
+```math
 \widehat{b}_{i,q}^{\mathrm{hard}}[k]
 =
 \begin{cases}
 0, & d_{i,q}^{(0)}[k] \leq d_{i,q}^{(1)}[k], \\
 1, & d_{i,q}^{(1)}[k] < d_{i,q}^{(0)}[k].
 \end{cases}
-$$
+```
 
 where:
 
 - $q$ identifies the bit position in the QAM symbol,
 - $\mathcal{S}_{q}^{(0)}$ contains constellation points whose $q$-th label bit is $0$,
 - $\mathcal{S}_{q}^{(1)}$ contains constellation points whose $q$-th label bit is $1$.
-
+```
 The hard-input Viterbi decoder receives only the resulting binary decisions.
 
 ### Soft-Bit Generation
