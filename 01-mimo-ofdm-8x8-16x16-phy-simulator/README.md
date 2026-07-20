@@ -276,71 +276,103 @@ The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement an
 
 The raw MMSE output is generally amplitude-biased. Define the composite response as
 
-```math
+$$
 \mathbf{G}[k]
 =
-\mathbf{W}_{\mathrm{MMSE}}[k]\widehat{\mathbf{H}}_s[k].
-```
+\mathbf{W}_{\mathrm{MMSE}}[k]
+\widehat{\mathbf{H}}_s[k].
+$$
 
 For spatial stream $i$, the effective MMSE gain is the corresponding diagonal element:
 
-```math
+$$
 g_i[k]
 =
 \left[\mathbf{G}[k]\right]_{i,i}.
-```
+$$
 
 The gain-corrected unbiased MMSE output is
 
-```math
+$$
 z_i[k]
 =
 \frac{\widetilde{x}_i[k]}{g_i[k]}.
-```
+$$
 
 In vector form,
 
-```math
+$$
 \mathbf{z}[k]
 =
-\mathbf{D}_g^{-1}[k]\widetilde{\mathbf{x}}[k],
-```
+\mathbf{D}_g^{-1}[k]
+\widetilde{\mathbf{x}}[k],
+$$
 
-where
+where the diagonal gain matrix is written explicitly as
 
-```math
+$$
 \mathbf{D}_g[k]
 =
-\operatorname{diag}\!\left(
-g_1[k],g_2[k],\ldots,g_{N_t}[k]
-\right).
-```
+\begin{bmatrix}
+g_1[k] & 0 & \cdots & 0 \\
+0 & g_2[k] & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & g_{N_t}[k]
+\end{bmatrix}.
+$$
 
 ### Per-Stream Effective Noise Variance
 
 Under the assumed linear-MMSE model and unit symbol power, the receiver-side reliability estimate for stream $i$ is
 
-```math
+$$
 \sigma_{\mathrm{eff},i}^{2}[k]
 =
 \frac{1-g_i[k]}{g_i[k]}.
-```
+$$
 
-A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates stronger residual interference and noise. With estimated CSI, this is a model-based reliability estimate rather than the exact realized error variance.
+A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates stronger residual interference and noise.
+
+With estimated CSI, this is a model-based reliability estimate rather than the exact realized error variance.
 
 ### Hard-Bit Generation
 
-The hard-decision branch converts each unbiased MMSE symbol into binary decisions:
+For bit position $q$ of the QAM symbol transmitted on stream $i$, define the minimum squared distance to the constellation subset associated with bit $0$ as
 
-```math
+$$
+d_{i,q}^{(0)}[k]
+=
+\min_{a\in\mathcal{S}_{q}^{(0)}}
+\left|z_i[k]-a\right|^2.
+$$
+
+Similarly, define the minimum squared distance to the constellation subset associated with bit $1$ as
+
+$$
+d_{i,q}^{(1)}[k]
+=
+\min_{a\in\mathcal{S}_{q}^{(1)}}
+\left|z_i[k]-a\right|^2.
+$$
+
+The hard bit decision is then
+
+$$
 \widehat{b}_{i,q}^{\mathrm{hard}}[k]
 =
-\underset{b\in\{0,1\}}{\operatorname{arg\,min}}
-\;\underset{a\in\mathcal{S}_{q}^{(b)}}{\min}
-\left|z_i[k]-a\right|^2.
-```
+\begin{cases}
+0, & d_{i,q}^{(0)}[k] \leq d_{i,q}^{(1)}[k], \\
+1, & d_{i,q}^{(1)}[k] < d_{i,q}^{(0)}[k].
+\end{cases}
+$$
 
-where $q$ identifies the bit position in the QAM symbol and $\mathcal{S}_{q}^{(b)}$ is the subset of constellation points whose $q$-th label bit equals $b$. The hard-input Viterbi decoder receives only the resulting binary values.
+where:
+
+- $q$ identifies the bit position in the QAM symbol,
+- $\mathcal{S}_{q}^{(0)}$ contains constellation points whose $q$-th label bit is $0$,
+- $\mathcal{S}_{q}^{(1)}$ contains constellation points whose $q$-th label bit is $1$.
+
+The hard-input Viterbi decoder receives only the resulting binary decisions.
 
 ### Soft-Bit Generation
 
