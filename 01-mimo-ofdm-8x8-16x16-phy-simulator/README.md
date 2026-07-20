@@ -176,12 +176,11 @@ The synchronization experiment evaluates acquisition performance separately. Its
 ### Power-Normalized MIMO Signal Model
 
 For subcarrier $k$, the received frequency-domain signal is
-```
 
+```math
 \mathbf{y}[k]
 =
-\frac{1}{\sqrt{N_t}}
-\mathbf{H}[k]\mathbf{x}[k]
+\frac{1}{\sqrt{N_t}}\mathbf{H}[k]\mathbf{x}[k]
 +
 \mathbf{n}[k].
 ```
@@ -193,21 +192,21 @@ where:
 - $\mathbf{x}[k]\in\mathbb{C}^{N_t\times 1}$ contains the unit-average-power spatial-layer symbols,
 - $\mathbf{H}[k]\in\mathbb{C}^{N_r\times N_t}$ is the frequency-domain MIMO channel,
 - $\mathbf{y}[k]\in\mathbb{C}^{N_r\times 1}$ is the received signal vector,
-- $\mathbf{n}[k]\sim\mathcal{CN}\left(\mathbf{0},\sigma_n^2\mathbf{I}_{N_r}\right)$ is complex Gaussian receiver noise.
+- $\mathbf{n}[k]\sim\mathcal{CN}\!\left(\mathbf{0},\sigma_n^2\mathbf{I}_{N_r}\right)$ is complex Gaussian receiver noise.
 
-The factor $1/\sqrt{N_t}$ keeps the total transmitted power constant when the number of transmit antennas changes.
+The factor $1/\sqrt{N_t}$ keeps the total transmit power constant when the number of transmit antennas changes.
 
-For compact notation, define the power-normalized channel as
+Define the power-normalized channel as
 
-```
+```math
 \mathbf{H}_s[k]
 =
 \frac{1}{\sqrt{N_t}}\mathbf{H}[k].
 ```
 
-The received signal model can then be written as
+The received signal model becomes
 
-$$
+```math
 \mathbf{y}[k]
 =
 \mathbf{H}_s[k]\mathbf{x}[k]
@@ -217,41 +216,34 @@ $$
 
 The corresponding estimated power-normalized channel is
 
-```
+```math
 \widehat{\mathbf{H}}_s[k]
 =
-\frac{1}{\sqrt{N_t}}
-\widehat{\mathbf{H}}[k].
+\frac{1}{\sqrt{N_t}}\widehat{\mathbf{H}}[k].
 ```
 
 ### Zero-Forcing Detection
 
-The zero-forcing detector estimates the transmitted symbol vector using the Moore-Penrose pseudo-inverse of the estimated channel:
+The zero-forcing detector estimates the transmitted symbol vector using the Moore-Penrose pseudo-inverse:
 
-```
+```math
 \widehat{\mathbf{x}}_{\mathrm{ZF}}[k]
 =
-\widehat{\mathbf{H}}_s^{\dagger}[k]
-\mathbf{y}[k].
+\widehat{\mathbf{H}}_s^{\dagger}[k]\mathbf{y}[k].
 ```
 
-Equivalently, when the required matrix inverse exists,
+When the Gram matrix is invertible, the same detector can be written as
 
-```
+```math
 \widehat{\mathbf{x}}_{\mathrm{ZF}}[k]
 =
 \left(
-\widehat{\mathbf{H}}_s^{H}[k]
-\widehat{\mathbf{H}}_s[k]
+\widehat{\mathbf{H}}_s^{H}[k]\widehat{\mathbf{H}}_s[k]
 \right)^{-1}
-\widehat{\mathbf{H}}_s^{H}[k]
-\mathbf{y}[k].
+\widehat{\mathbf{H}}_s^{H}[k]\mathbf{y}[k].
 ```
 
-where:
-
-- $(\cdot)^{H}$ denotes the Hermitian transpose,
-- $(\cdot)^{\dagger}$ denotes the Moore-Penrose pseudo-inverse.
+where $(\cdot)^H$ denotes the Hermitian transpose and $(\cdot)^\dagger$ denotes the Moore-Penrose pseudo-inverse.
 
 ZF suppresses inter-stream interference through channel inversion. However, it can strongly amplify receiver noise when the estimated channel matrix is poorly conditioned.
 
@@ -259,12 +251,11 @@ ZF suppresses inter-stream interference through channel inversion. However, it c
 
 The MMSE equalization matrix is
 
-```
+```math
 \mathbf{W}_{\mathrm{MMSE}}[k]
 =
 \left(
-\widehat{\mathbf{H}}_s^{H}[k]
-\widehat{\mathbf{H}}_s[k]
+\widehat{\mathbf{H}}_s^{H}[k]\widehat{\mathbf{H}}_s[k]
 +
 \sigma_n^2\mathbf{I}_{N_t}
 \right)^{-1}
@@ -273,176 +264,134 @@ The MMSE equalization matrix is
 
 The raw MMSE symbol estimate is
 
-```
+```math
 \widetilde{\mathbf{x}}[k]
 =
-\mathbf{W}_{\mathrm{MMSE}}[k]
-\mathbf{y}[k].
+\mathbf{W}_{\mathrm{MMSE}}[k]\mathbf{y}[k].
 ```
 
-The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement and makes MMSE detection more stable than direct channel inversion.
+The regularization term $\sigma_n^2\mathbf{I}_{N_t}$ limits noise enhancement and improves numerical stability compared with direct channel inversion.
 
 ### Unbiased MMSE Output
 
-The raw MMSE output is generally amplitude-biased. Define the composite MMSE response as
+The raw MMSE output is generally amplitude-biased. Define the composite response as
 
-```
+```math
 \mathbf{G}[k]
 =
-\mathbf{W}_{\mathrm{MMSE}}[k]
-\widehat{\mathbf{H}}_s[k].
+\mathbf{W}_{\mathrm{MMSE}}[k]\widehat{\mathbf{H}}_s[k].
 ```
 
-For spatial stream $i$, the effective MMSE gain is obtained from the corresponding diagonal element:
+For spatial stream $i$, the effective MMSE gain is the corresponding diagonal element:
 
-```
+```math
 g_i[k]
 =
-\left[
-\mathbf{G}[k]
-\right]_{i,i}.
+\left[\mathbf{G}[k]\right]_{i,i}.
 ```
 
 The gain-corrected unbiased MMSE output is
 
-```
+```math
 z_i[k]
 =
-\frac{\widetilde{x}_i[k]}
-{g_i[k]}.
+\frac{\widetilde{x}_i[k]}{g_i[k]}.
 ```
 
-The vector form is
+In vector form,
 
-```
+```math
 \mathbf{z}[k]
 =
-\mathbf{D}_g^{-1}[k]
-\widetilde{\mathbf{x}}[k],
+\mathbf{D}_g^{-1}[k]\widetilde{\mathbf{x}}[k],
 ```
 
 where
 
-```
+```math
 \mathbf{D}_g[k]
 =
-\operatorname{diag}
-\left(
-g_1[k],
-g_2[k],
-\ldots,
-g_{N_t}[k]
+\operatorname{diag}\!\left(
+g_1[k],g_2[k],\ldots,g_{N_t}[k]
 \right).
 ```
 
 ### Per-Stream Effective Noise Variance
 
-Under the assumed linear-MMSE model and unit symbol power, the reliability of stream $i$ is represented by the effective error variance
+Under the assumed linear-MMSE model and unit symbol power, the receiver-side reliability estimate for stream $i$ is
 
-```
+```math
 \sigma_{\mathrm{eff},i}^{2}[k]
 =
-\frac{1-g_i[k]}
-{g_i[k]}.
+\frac{1-g_i[k]}{g_i[k]}.
 ```
 
-A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates greater residual interference and noise.
-
-When estimated CSI is used, this quantity represents the receiver-side reliability estimate rather than the exact realized error variance.
+A small value of $\sigma_{\mathrm{eff},i}^{2}[k]$ indicates a reliable stream, while a large value indicates stronger residual interference and noise. With estimated CSI, this is a model-based reliability estimate rather than the exact realized error variance.
 
 ### Hard-Bit Generation
 
-The hard-decision branch converts each unbiased MMSE symbol directly into binary decisions:
+The hard-decision branch converts each unbiased MMSE symbol into binary decisions:
 
-```
+```math
 \widehat{b}_{i,q}^{\mathrm{hard}}[k]
 =
 \underset{b\in\{0,1\}}{\operatorname{arg\,min}}
-\;
-\underset{a\in\mathcal{S}_{q}^{(b)}}{\min}
-\left|
-z_i[k]-a
-\right|^2.
+\;\underset{a\in\mathcal{S}_{q}^{(b)}}{\min}
+\left|z_i[k]-a\right|^2.
 ```
-```
-where:
 
-- $q$ identifies the bit position within the QAM symbol,
-- $\mathcal{S}_{q}^{(b)}$ is the subset of constellation points whose $q$-th label bit equals $b$.
-
-The hard-input Viterbi decoder receives only the resulting binary values.
+where $q$ identifies the bit position in the QAM symbol and $\mathcal{S}_{q}^{(b)}$ is the subset of constellation points whose $q$-th label bit equals $b$. The hard-input Viterbi decoder receives only the resulting binary values.
 
 ### Soft-Bit Generation
 
 For coded bit $b_q$, the max-log LLR generated from stream $i$ is approximated as
 
-```
-L\left(
-b_q\mid z_i[k]
-\right)
+```math
+L\!\left(b_q\mid z_i[k]\right)
 \approx
-\frac{1}
-{\sigma_{\mathrm{eff},i}^{2}[k]}
+\frac{1}{\sigma_{\mathrm{eff},i}^{2}[k]}
 \left[
-\underset{a\in\mathcal{S}_{q}^{(1)}}{\min}
-\left|
-z_i[k]-a
-\right|^2
+\underset{a\in\mathcal{S}_{q}^{(1)}}{\min}\left|z_i[k]-a\right|^2
 -
-\underset{a\in\mathcal{S}_{q}^{(0)}}{\min}
-\left|
-z_i[k]-a
-\right|^2
+\underset{a\in\mathcal{S}_{q}^{(0)}}{\min}\left|z_i[k]-a\right|^2
 \right].
 ```
 
-This definition uses the convention
+The LLR sign convention is
 
-```
-L\left(b_q\mid z_i[k]\right)
+```math
+L\!\left(b_q\mid z_i[k]\right)
 =
-\ln
-\frac{
-P\left(b_q=0\mid z_i[k]\right)
-}{
-P\left(b_q=1\mid z_i[k]\right)
-}.
+\ln\!\left(
+\frac{P\!\left(b_q=0\mid z_i[k]\right)}
+{P\!\left(b_q=1\mid z_i[k]\right)}
+\right).
 ```
 
 Therefore:
 
 - a positive LLR indicates that bit $0$ is more likely,
 - a negative LLR indicates that bit $1$ is more likely,
-- a larger absolute LLR indicates greater confidence,
-- an LLR near zero indicates an unreliable decision.
+- a large absolute LLR indicates high confidence,
+- an LLR close to zero indicates low confidence.
 
-The hard- and soft-decision Viterbi branches use the same gain-corrected unbiased symbol sequence $\mathbf{z}[k]$. The only difference is that the hard branch receives binary decisions, while the soft branch receives reliability-valued LLRs.
+The hard- and soft-decision Viterbi branches use the same gain-corrected unbiased symbol sequence $\mathbf{z}[k]$. The hard branch receives binary decisions, while the soft branch receives reliability-valued LLRs.
 
 ### Measured Soft-Decision Gain
 
 At a selected target coded BER, the soft-decision gain is defined as
 
-```
-\Delta\mathrm{SNR}
-\left(
-\mathrm{BER}_{\mathrm{target}}
-\right)
+```math
+\Delta\mathrm{SNR}\!\left(\mathrm{BER}_{\mathrm{target}}\right)
 =
-\mathrm{SNR}_{\mathrm{hard}}
-\left(
-\mathrm{BER}_{\mathrm{target}}
-\right)
+\mathrm{SNR}_{\mathrm{hard}}\!\left(\mathrm{BER}_{\mathrm{target}}\right)
 -
-\mathrm{SNR}_{\mathrm{soft}}
-\left(
-\mathrm{BER}_{\mathrm{target}}
-\right).
+\mathrm{SNR}_{\mathrm{soft}}\!\left(\mathrm{BER}_{\mathrm{target}}\right).
 ```
 
 A positive value of $\Delta\mathrm{SNR}$ means that the soft-decision decoder reaches the selected BER target at a lower SNR than the hard-decision decoder.
 
-The target crossings are interpolated on the logarithmic BER axis only when the measured BER curve crosses the requested target within the simulated SNR range. No crossing is extrapolated beyond the measured results.
-
+Target crossings are interpolated on the logarithmic BER axis only when the measured BER curve crosses the requested target within the simulated SNR range. No crossing is extrapolated beyond the measured results.
 
 ---
 
