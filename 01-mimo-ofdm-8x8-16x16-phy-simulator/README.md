@@ -372,6 +372,7 @@ where:
 - $\mathcal{S}_{q}^{(1)}$ contains constellation points whose $q$-th label bit is $1$.
 ```
 The hard-input Viterbi decoder receives only the resulting binary decisions.
+```
 
 ### Soft-Bit Generation
 
