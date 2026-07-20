@@ -38,7 +38,6 @@ The project was developed to answer the following technical questions:
 - How strongly does square-array scaling affect ZF and regularized MMSE detection?
 - What is gained by preserving reliability information for soft Viterbi decoding?
 - Does the benefit of statistical receiver processing increase as the MIMO array becomes larger?
-- Can all reported figures and numerical findings be regenerated from stored simulation results?
 
 ---
 
