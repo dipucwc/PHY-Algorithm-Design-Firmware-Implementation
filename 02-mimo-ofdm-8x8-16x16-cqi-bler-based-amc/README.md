@@ -8,7 +8,7 @@
 
 | Item | Description |
 |---|---|
-| **Project stage** | Project 2 — advanced link-adaptation extension |
+| **Project stage** | Project- advanced link-adaptation extension |
 | **Implementation** | MATLAB |
 | **Array configurations** | 8×8 and 16×16 square MIMO |
 | **Waveform** | MIMO-OFDM |
@@ -58,7 +58,7 @@ The project is a research-oriented MIMO-OFDM link-adaptation study. It does not 
 
 The portfolio is intentionally divided into two distinct stages.
 
-| Feature | Project 1 — PHY baseline | Project 2 — this project |
+| Feature | Project-1 PHY baseline | Project 2 — this project |
 |---|---|---|
 | Adaptation input | Configured operating SNR | Receiver-estimated post-MMSE quality |
 | Modulation | Threshold-selected QPSK, 16-QAM, or 64-QAM | Selected through the MCS table |
