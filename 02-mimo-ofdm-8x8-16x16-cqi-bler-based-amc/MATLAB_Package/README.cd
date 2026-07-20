@@ -1,0 +1,7 @@
+## MATLAB Package
+
+This folder contains the complete MATLAB implementation of the Scalable 8×8 and 16×16 MIMO-OFDM PHY Simulator with CQI/BLER-Based Adaptive Modulation and Coding.
+
+The package includes MIMO-OFDM transmitter and receiver processing, channel modeling, synchronization, LS and MMSE channel estimation, ZF and MMSE equalization, receiver-side CQI estimation, BLER-targeted MCS selection, adaptive modulation, dynamic coding-rate selection, convolutional coding, Viterbi decoding, and performance evaluation using BER, BLER, EVM, SINR, throughput, spectral efficiency, and channel-capacity metrics.
+
+Run the main MATLAB script to configure the antenna size, CQI reporting method, target BLER, supported MCS table, and simulation parameters. The simulation evaluates the 8×8 and 16×16 configurations and generates the corresponding performance results and figures.
