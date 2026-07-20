@@ -25,7 +25,7 @@ The project covers five important PHY/modem algorithm areas:
 
 A central part of the study is the controlled comparison between **hard-decision and soft-decision Viterbi decoding**. Both decoder branches are generated from the same gain-corrected, unbiased MMSE symbol stream. The hard branch discards reliability information and passes binary decisions to the decoder, while the soft branch uses per-stream effective-noise-variance-scaled log-likelihood ratios.
 
-> **Scope note:** This is a general MIMO-OFDM PHY/modem algorithm simulator. It is not presented as a standards-compliant 5G NR PDSCH implementation. This repository stage is **Project 1**, where modulation is selected through configured SNR thresholds and the channel-code rate remains fixed at 1/2. **Project 2**, maintained separately, extends the verified baseline to receiver-generated CQI, BLER-targeted MCS selection, and variable-rate adaptive modulation and coding.
+> **Scope note:**  This repository stage is **Project 1**, where modulation is selected through configured SNR thresholds and the channel-code rate remains fixed at 1/2. **Project 2**, maintained separately, extends the verified baseline to receiver-generated CQI, BLER-targeted MCS selection, and variable-rate adaptive modulation and coding.
 
 ---
 
