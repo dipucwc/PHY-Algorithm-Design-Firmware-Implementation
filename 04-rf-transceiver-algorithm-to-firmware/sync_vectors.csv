@@ -1,0 +1,2 @@
+Nfft,L,cp,preamble_len,frame_len,true_eps,d_hat_ref,eps_coarse_ref
+64,32,16,64,280,0.25,58,0.64185061
