@@ -1,3 +1,126 @@
 # RF Transceiver Algorithm-to-Firmware Implementation
 
-This folder contains the RF transceiver algorithm-to-firmware implementation project, including embedded C, C++17, Q15 fixed-point arithmetic, register-map abstraction, RF control state machine, PA/DPD modeling, CMake build system, and unit testing.
+Embedded **C** implementations of the deployable signal-processing and control algorithms of two
+MIMO-OFDM physical-layer projects, ported from verified MATLAB link-level models and proven against
+golden reference vectors on every build.
+
+This repository demonstrates the complete algorithm-to-firmware workflow used in PHY / baseband
+development: an algorithm is first designed and validated in a floating-point research environment
+(MATLAB), the parts that run on-chip are then re-implemented in C — in fixed point where the target
+has no floating-point unit — and the firmware is proven equivalent to the reference through shared
+test vectors and continuous integration. Nothing is claimed correct until a test asserts it against
+the reference.
+
+## Repository structure
+
+```
+RF_Transceiver_Algorithm_to_Firmware_Implementation/
+│
+├── 01_MIMO_OFDM_PHY_Receiver/        Project 1: the open-loop MIMO-OFDM receiver chain
+│   ├── src/                          8 receiver kernels + the main pipeline program
+│   ├── include/                      headers (complex helper, sync, chanest, matrix, equalize, metrics)
+│   ├── test/                         4 golden-vector test suites
+│   ├── vectors/                      golden reference vectors (CSV)
+│   ├── reference/                    the MATLAB .m files each kernel was ported from
+│   ├── scripts/                      golden-vector export (reproduces the reference algorithms)
+│   ├── docs/                         complete build-and-run instructions (Word)
+│   └── CMakeLists.txt
+│
+├── 02_CQI_AMC_Link_Adaptation/       Project 2: the closed-loop CQI-based adaptive modulation and coding
+│   ├── src/                          8 link-adaptation kernels + the main closed-loop program
+│   ├── include/                      headers (fixed point, CRC, math, EESM, quality, MCS, coding, regmap, state)
+│   ├── test/                         6 test suites (golden-vector and functional)
+│   ├── vectors/  reference/  scripts/  docs/
+│   └── CMakeLists.txt
+│
+└── .github/workflows/ci.yml          builds and tests BOTH projects on every push
+```
+
+## The two projects
+
+| # | Project | What the firmware does | Ported from |
+|---|---|---|---|
+| 01 | **MIMO-OFDM PHY Receiver** | The per-frame receiver chain of an 8x8 / 16x16 MIMO-OFDM link: Schmidl-Cox timing detection, coarse and fine carrier-frequency-offset estimation and correction, least-squares and Wiener MMSE channel estimation, zero-forcing / MMSE / soft-output MMSE detection with bias removal, and the link-quality measurements (SINR, EVM) with threshold modulation selection. | The verified MATLAB link-level simulator of Project 1 (13 algorithm functions ported). |
+| 02 | **CQI-Based AMC Link Adaptation** | The per-slot closed control loop of the same link: CRC-16 block check, Q16.16 fixed-point effective-SINR mapping (EESM) with integer exp/ln/log10, receiver-side per-stream SINR estimation and the per-layer quality report (CQI), BLER-constrained MCS selection with ordered tie-breaks, the variable-rate coding chain (K=7 encoder, puncturing, erasure depuncturing, causal feedback delay), and the control state machine with the fraction-weighted outer-loop (OLLA) update. | The verified MATLAB link-adaptation model of Project 2 (16 reference files ported). |
+
+Project 1 is the **open-loop baseline** — its threshold rule selects the modulation from the operating
+SNR without ever observing the receiver. Project 2 **closes the loop**: the receiver measures, reports,
+and the transmitter adapts under an explicit block-error-rate target with an outer loop that converges
+the long-run error rate to that target. Read in that order, the two projects tell one story.
+
+## The algorithm-to-firmware workflow
+
+Every kernel in both projects went through the same four steps:
+
+1. **Reference first.** The algorithm was developed and verified in the MATLAB link-level model. The
+   exact `.m` files are included in each project's `reference/` folder, so every C file is traceable
+   to the algorithm it implements.
+2. **Deployable scope.** Only the operations a transceiver executes per frame or per slot were
+   ported. The Monte Carlo harnesses, channel generators, offline calibrations, and plotting remain
+   in MATLAB by design — each project's README lists every remaining file with its reason.
+3. **Firmware-friendly form.** The C uses the forms an embedded target wants: direct small-system
+   solves instead of explicit matrix inverses, a running-window correlator instead of vectorized
+   cumulative sums, Q16.16 integer arithmetic with range-reduced series where no FPU is assumed, and
+   a register-map abstraction that separates the control logic from the physical register layout.
+4. **Proof, not claims.** A Python export script reproduces the reference algorithms and writes
+   golden vectors; every C kernel is tested against them, and CMake + GitHub Actions runs the full
+   suite on every push.
+
+## Verification summary
+
+| Project | Suites | Key results |
+|---|---|---|
+| 01 | 4 / 4 pass | Timing index exact; coarse CFO error 5e-10; ZF / MMSE / soft-MMSE detection to 1e-9; SINR and EVM to 5e-9; LS / fine-CFO / Wiener application to 3e-10; threshold selection exact including the 8 and 18 dB boundaries. |
+| 02 | 6 / 6 pass | CRC 10/10 bit-exact against the reference polynomial division; Q16.16 EESM within 0.004 dB of the double-precision reference; per-stream SINR to 2e-10 relative and the quality report within 0.001 dB; encoder impulse response exact for the (133, 171) generators; puncture / depuncture round trip and one-slot feedback causality; OLLA direction, zero drift at the target fraction, and clamp. |
+
+Both projects compile cleanly under `-Wall -Wextra -Wpedantic` (Project 2 additionally under
+`-Wshadow -Wconversion`) with zero warnings.
+
+## Building and running
+
+Each project builds independently with the same three commands. Requirements: a C11 compiler and
+CMake >= 3.15 (Python 3 with NumPy only to regenerate the vectors, which ship pre-generated).
+
+```bash
+# Project 1
+cd 01_MIMO_OFDM_PHY_Receiver
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure      # expected: 100% tests passed, 4/4
+./build/main_phy_firmware                        # runs the receive pipeline once
+
+# Project 2
+cd ../02_CQI_AMC_Link_Adaptation
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure      # expected: 100% tests passed, 6/6
+./build/main_amc_firmware                        # runs the closed loop once
+```
+
+A complete step-by-step run guide for each project, from a fresh download to the verified result, is
+in `docs/ProjectN_Run_Instructions.docx` inside each subfolder.
+
+## Code and documentation style
+
+Every C file follows one uniform documentation convention, mirrored from the MATLAB reference style:
+a boxed header per file and per function with a **Description** (what is done and the complete
+procedure), aligned **Input** and **Output** lists, and a **Supporting files** section that names the
+headers used, the reference `.m` files, and the kernels called — plus a comment on every code line.
+Each project's `main_*.c` is the intended entry point for reading: its header describes the whole
+pipeline and lists every supporting function.
+
+## Scope and honesty
+
+The MCS table of Project 2 is a nine-entry research table (QPSK / 16-QAM / 64-QAM at rates 1/2, 2/3,
+3/4), not a standardized 3GPP table, and the simplified model treats the CQI and the MCS index as
+the same scale. The repositories port and verify the deployable kernels of the reference models and
+do not claim a real-time or on-target demonstration. The soft-decision Viterbi decoder of Project 2
+remains in MATLAB and is listed as the planned extension. The EESM calibration parameters are the
+configured values of the reference runs.
+
+## Note on placing this folder inside a larger repository
+
+GitHub Actions only executes workflow files located at the **repository root**. If this folder is
+the repository root, `.github/workflows/ci.yml` runs both projects as delivered. If this folder is a
+subfolder of a larger repository, move the `.github` folder to that repository's root and prefix the
+two `working-directory` values with this folder's path.
