@@ -1,0 +1,97 @@
+# Project 2 - CQI-Based AMC Link Adaptation (Algorithm-to-Firmware, C)
+
+Embedded **C** implementation of the deployable signal-processing and control
+kernels of a MIMO-OFDM PHY link-adaptation chain, ported from a verified
+floating-point reference model and checked **bit-for-bit / within a declared
+fixed-point tolerance** against golden vectors exported from that reference.
+
+This repository demonstrates the algorithm-to-firmware workflow used in PHY /
+baseband development: take an algorithm that has been validated in a
+floating-point research environment (MATLAB), re-implement the parts that run
+on-chip in fixed-point C without a hardware FPU, and prove the firmware matches
+the reference through shared test vectors and continuous integration.
+
+## Scope
+
+The kernels here are the *fixed-complexity, per-slot* parts of the link that a
+real transceiver executes every slot. The Monte Carlo experiment framework,
+channel generation, and plotting of the research model are **not** ported —
+they are a test harness, not firmware.
+
+| Firmware module (C) | Reference (`reference/`) | What it demonstrates |
+|---|---|---|
+| `rf_crc16` | `crc16_bits.m`, `append_crc.m`, `check_crc.m` | Bit-exact CRC-16-CCITT block check (TX append / RX verify) |
+| `rf_eesm` + `rf_math` | `calculate_effective_sinr.m` | EESM effective-SINR mapping in **Q16.16**, with fixed-point `exp`/`ln`/`log10` |
+| `rf_quality` | `estimate_post_eq_sinr.m`, `estimate_quality_report.m`, `estimate_cqi.m` | Per-stream post-equalization SINR from the estimated channel, the per-layer quality report, and the uncorrected CQI |
+| `rf_mcs` | `select_mcs_for_target_bler.m`, `interpolate_bler_curve.m`, `create_mcs_table.m` | BLER-constrained MCS selection, monotone curve interpolation, tie-breaks |
+| `rf_coding` | `encode_variable_rate.m`, `select_puncturing_pattern.m`, `apply_puncturing.m`, `depuncture_llr.m`, `apply_cqi_feedback_delay.m` | Rate-1/2 K=7 encoder, puncturing to 2/3 and 3/4, erasure depuncturing, causal CQI delay buffer |
+| `rf_state` | run loop + `update_olla_offset.m` | RF control state machine + fraction-weighted outer-loop (OLLA) update |
+| `rf_regmap` | — | Memory-mapped register abstraction (host-simulated / target-portable) |
+
+MATLAB files that remain simulation-only, and why:
+
+| MATLAB file | Why it stays in MATLAB |
+|---|---|
+| `main_cqi_amc_*.m`, `run_cqi_amc_main.m`, `run_cqi_amc_comparison.m` | Monte Carlo evaluation harness over the SNR sweep |
+| `generate_mcs_bler_curves.m`, `verify_curve_mapping.m` | Offline calibration that produces the curves the firmware consumes |
+| `prepare_slot_shared.m`, `run_slot_link.m`, `build_link_precompute.m` | Shared-realization simulation plumbing for fair comparisons |
+| `decode_variable_rate.m` (Viterbi) | Soft decoder; a fixed-point Viterbi is a planned extension |
+| `mmse_equalize_soft.m`, `ls_pilot_estimate.m`, Wiener files, `mimo_freq_response.m` | Receiver front-end and channel model shared with the Project 1 platform |
+| `plot_amc_results.m`, `run_verification_gates.m`, `compute_bler.m`, `create_cqi_amc_config.m` | Reporting, simulation-side gates, and the experiment configuration |
+
+## Fixed-point design
+
+- **Q1.15 (`q15_t`)** for unit-scaled quantities; **Q16.16 (`q16_t`)** for SINR
+  in dB and for accumulation that exceeds the Q15 range.
+- The EESM kernel evaluates `exp`, `ln`, and `log10` with range-reduced
+  polynomial / bit-scan approximations, so it runs on an integer DSP core. The
+  effective-SINR result matches the double-precision reference to
+  **max |error| = 0.0041 dB** across all golden cases (tolerance 0.10 dB).
+- All 32→16-bit narrowing goes through a saturating cast (`rf_sat_q15`).
+
+## Verification (golden-vector cross-check)
+
+`scripts/export_vectors.py` reproduces the reference algorithms exactly and
+writes `vectors/*.csv`. Each C unit test reads the same inputs, runs the
+fixed-point kernel, and asserts agreement with the reference output:
+
+| Test | Check | Result |
+|---|---|---|
+| `test_crc16` | C CRC vs reference polynomial division | 10/10 bit-exact |
+| `test_eesm`  | Q16.16 EESM vs double reference | max err 0.0041 dB |
+| `test_mcs`   | selector tie-breaks, fallback, monotonicity | pass |
+| `test_state` | FSM sequencing, OLLA direction / target-locked drift / clamp | pass |
+
+This mirrors the reference model's own discipline: no kernel is considered
+correct until the test asserts it against the reference.
+
+## Build and test
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+Requires a C11 compiler and CMake ≥ 3.15. CI (`.github/workflows/ci.yml`)
+builds and runs the full test suite on every push.
+
+## Layout
+
+```
+include/    public headers (fixed-point types, register map, kernels)
+src/        embedded C kernels
+test/       golden-vector and functional unit tests
+vectors/    reference vectors (regenerate with scripts/export_vectors.py)
+reference/  the MATLAB reference (.m) the C is ported from
+scripts/    vector export
+```
+
+## Notes on scope and honesty
+
+The MCS table is a nine-entry custom research table (QPSK/16-QAM/64-QAM ×
+rate 1/2, 2/3, 3/4), not a standardized 3GPP table. The reference model is a
+link-level research simulator; this repository ports its deployable kernels to
+fixed-point C and verifies them, and does not claim a real-time or on-target
+demonstration. The EESM calibration parameters (`beta`) are the configured
+values of the reference run.
