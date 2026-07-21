@@ -1,0 +1,96 @@
+# Project 1 - MIMO-OFDM PHY Receiver (Algorithm-to-Firmware, C)
+
+Embedded **C** implementation of the deployable receiver kernels of a MIMO-OFDM
+physical layer, ported from a verified MATLAB reference model and checked
+against golden vectors exported from that same reference.
+
+This repository demonstrates the algorithm-to-firmware workflow used in PHY /
+baseband development: an algorithm is first validated in a floating-point
+research environment (MATLAB), then the parts that run on-chip are
+re-implemented in C and proven to match the reference through shared test
+vectors and continuous integration.
+
+## What is ported
+
+The kernels here are the per-frame / per-subcarrier receiver operations a real
+transceiver executes. Each C file mirrors one MATLAB reference function, keeps
+the same header-block description, and carries the same inline comments so the
+C reads like the reference.
+
+| Firmware module (C) | Reference (`reference/`) | What it does |
+|---|---|---|
+| `rf_sync` | `schmidl_cox_metric.m`, `estimate_coarse_cfo.m`, `apply_cfo.m` | OFDM timing detection and carrier-frequency-offset estimation / correction |
+| `rf_chanest` | `ls_pilot_estimate.m`, `estimate_fine_cfo.m`, `wiener_mmse_estimate.m` | LS pilot estimate, fine carrier-offset refinement, Wiener MMSE filter application |
+| `rf_equalize` + `rf_matrix` | `zf_equalize_mimo.m`, `mmse_equalize_mimo.m`, `mmse_equalize_soft.m` | ZF, MMSE, and soft-output MMSE detection with bias removal and per-stream noise variance |
+| `rf_metrics` | `compute_sinr.m`, `compute_evm.m`, `amc_select_modulation.m` | Post-equalization SINR, EVM, and threshold modulation selection |
+| `rf_complex` | (built-in MATLAB complex) | Complex-number helper so the C reads like the reference |
+
+MATLAB files that remain simulation-only, and why:
+
+| MATLAB file | Why it stays in MATLAB |
+|---|---|
+| `main_phy_simulation*.m`, `run_size_comparison.m` | Monte Carlo evaluation harness over the SNR sweep, not per-frame firmware |
+| `apply_tdla_channel.m`, `mimo_freq_response.m` | Channel generators: they model the propagation environment, not the receiver |
+| `generate_preamble.m` | Transmitter-side fixed-sequence generation tied to the MATLAB random-number stream |
+| `compute_wiener_matrices.m` | Offline computation of the Wiener filter from channel statistics; the firmware applies the result |
+| `compute_mimo_capacity.m`, `interp_snr_at_ber.m` | Analysis metrics (SVD capacity, curve interpolation) used for reporting |
+| `demod_ofdm_symbol.m`, `test_llr_sign_convention.m` | Single-antenna simulation path and a simulation-side unit check |
+
+The channel model, Monte Carlo sweep, and plotting of the research model are
+**not** ported — they are a test harness, not firmware.
+
+## How it is written
+
+- One C file per MATLAB function, same order, same names, same comments, so the
+  mapping is one-to-one and easy to walk through.
+- The MIMO equalizers solve a small `Nt x Nt` system directly (Gauss-Jordan
+  with partial pivoting) instead of forming an explicit matrix inverse, which
+  is the firmware-friendly equivalent of the MATLAB backslash / pseudo-inverse.
+- The Schmidl-Cox metric uses a running window, the natural streaming form for a
+  receiver.
+- Double precision is used so the C output matches the MATLAB reference exactly;
+  a fixed-point build swaps only the `cplx_t` type and keeps every call site.
+
+## Verification (golden-vector cross-check)
+
+`scripts/export_vectors.py` reproduces the MATLAB reference algorithms exactly
+and writes `vectors/*.csv`. Each C unit test reads the same inputs, runs the C
+kernel, and asserts agreement with the reference output.
+
+| Test | Check | Result |
+|---|---|---|
+| `test_sync`     | timing index + coarse CFO vs reference | index exact, CFO err 5e-10 |
+| `test_equalize` | ZF + MMSE outputs vs reference (9 cases) | max err 1e-9 |
+| `test_metrics`  | SINR, EVM (6 cases) + threshold AMC (9 cases) | max err 5e-9 |
+
+No kernel is considered correct until its test asserts it against the reference.
+
+## Build and test
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+Requires a C11 compiler and CMake >= 3.15. CI (`.github/workflows/ci.yml`)
+builds and runs the full suite on every push.
+
+## Layout
+
+```
+include/    public headers (complex helper, matrix, sync, equalize, metrics)
+src/        embedded C kernels
+test/       golden-vector unit tests
+vectors/    reference vectors (regenerate with scripts/export_vectors.py)
+reference/  the MATLAB reference (.m) the C is ported from
+scripts/    vector export
+```
+
+## Notes on scope
+
+The threshold modulation rule (`amc_select_modulation`) is the open-loop
+Project 1 baseline: it selects the QAM order from the operating SNR with the
+coding rate fixed at 1/2. The closed-loop CQI-based adaptation is the separate
+Project 2 firmware. This repository ports and verifies the Project 1 receiver
+kernels and does not claim a real-time or on-target demonstration.
